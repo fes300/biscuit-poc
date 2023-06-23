@@ -2,6 +2,7 @@ package authrules
 
 import "github.com/biscuit-auth/biscuit-go/parser"
 
+/* this will stay in the package */
 var IfUserRoleAllowsOperation = parser.New().Must().Rule(`
  right($operation) 
 	 <- user($user_id, $role),
@@ -10,6 +11,7 @@ var IfUserRoleAllowsOperation = parser.New().Must().Rule(`
 	 $permissions.contains($operation)
 `)
 
+/* this will stay in the package */
 var IfUserHasCustomPermissionForOperation = parser.New().Must().Rule(`
  right($operation) 
 	 <- operation($operation),
@@ -17,6 +19,7 @@ var IfUserHasCustomPermissionForOperation = parser.New().Must().Rule(`
 	 $custom_permissions.contains($operation)
 `)
 
+/* this will stay in the service */
 var IfUserIsOwnerHeCanWriteCard = parser.New().Must().Rule(`
  right($operation) 
 	 <- operation($operation),

@@ -32,8 +32,7 @@ func NewCardHandler(b biscuit.Biscuit) CardHandler {
 }
 
 func (h *CardHandler) Process(c *gin.Context) {
-	h.AuthMiddleware(c.Request.Header.Get("token")) // this will be taken care by the package
-
+	h.AuthMiddleware(c.Request.Header.Get("token"))
 	/* we register custom facts specific to the endpoint */
 	h.RegisterEndpointFacts()
 	/* we load relationship data from DB and add facts if needed */
@@ -52,6 +51,7 @@ func (h *CardHandler) Process(c *gin.Context) {
 	c.Done()
 }
 
+/* this will stay in the package */
 func (h *CardHandler) AuthMiddleware(tokenString string) {
 	authorizer, err := h.serviceBiscuit.Authorizer(keys.PublicRoot)
 	if err != nil {
@@ -66,6 +66,7 @@ func (h *CardHandler) AuthMiddleware(tokenString string) {
 	h.RegisterCustomPermissions()
 }
 
+/* this will stay in the package */
 func (h *CardHandler) RegisterTokenClaims(tokenString string) {
 	claims := TokenClaims{}
 	json.Unmarshal([]byte(tokenString), &claims)
@@ -75,12 +76,7 @@ func (h *CardHandler) RegisterTokenClaims(tokenString string) {
 	h.authorizer.AddFact(parser.New().Must().Fact(fmt.Sprintf(`user("%s", "%s")`, claims.UserID, claims.Role)))
 }
 
-func (h *CardHandler) RegisterEndpointFacts() {
-	h.authorizer.AddFact(parser.New().Must().Fact(`operation("card:write")`))
-	h.authorizer.AddFact(parser.New().Must().Fact(`card("my-card-id")`))
-	h.authorizer.AddPolicy(authpolicies.IfHasRightToPerformOperation)
-}
-
+/* this will stay in the package */
 func (h *CardHandler) RegisterCustomPermissions() {
 	fmt.Printf(`RegisterCustomPermissions -> claims: %+v`, h.claims)
 	permissions := db.GetCustomPermissions(h.claims.UserID)
@@ -99,6 +95,12 @@ func (h *CardHandler) RegisterCustomPermissions() {
 
 		h.authorizer.AddFact(parser.New().Must().Fact(fmt.Sprintf(`custom_permissions([%s])`, permissionsString)))
 	}
+}
+
+func (h *CardHandler) RegisterEndpointFacts() {
+	h.authorizer.AddFact(parser.New().Must().Fact(`operation("card:write")`))
+	h.authorizer.AddFact(parser.New().Must().Fact(`card("my-card-id")`))
+	h.authorizer.AddPolicy(authpolicies.IfHasRightToPerformOperation)
 }
 
 func (h *CardHandler) RegisterOwnershipData() {

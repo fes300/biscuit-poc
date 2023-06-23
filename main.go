@@ -19,11 +19,10 @@ func main() {
 	router.Run("localhost:8080")
 }
 
+/* this will stay in the service */
 func registerServicePolicies() biscuit.Biscuit {
-	/* create buiscuits builder */
 	builder := biscuit.NewBuilder(keys.PrivateRoot)
 
-	/* register service facts and rules */
 	builder.AddAuthorityFact(authfacts.AdminFact)
 	builder.AddAuthorityFact(authfacts.BuyerFact)
 	builder.AddAuthorityRule(authrules.IfUserRoleAllowsOperation)
